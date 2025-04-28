@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+ module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: '你是一个专业的Web3钱包资产分析师。' },
-          { role: 'user', content: `以下是我的钱包资产情况：${assets}。请你帮我分析这个钱包的特点和可能属于什么类型的用户？` }
+          { role: 'user', content: `以下是我的钱包资产情况：${assets}。请帮我分析这个钱包的特点和用户类型。` }
         ]
       })
     });
@@ -50,4 +50,3 @@ module.exports = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
-
