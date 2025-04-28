@@ -1,6 +1,6 @@
  module.exports = async (req, res) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
   const { address } = req.body;
@@ -10,22 +10,22 @@
   }
 
   try {
-    const covalentRes = await fetch(`https://api.covalenthq.com/v1/1/address/${address}/balances_v2/?key=${process.env.COVALENT_API_KEY}`);
-    const covalentData = await covalentRes.json();
+    const covalentResponse = await fetch(`https://api.covalenthq.com/v1/1/address/${address}/balances_v2/?key=${process.env.COVALENT_API_KEY}`);
+    const covalentData = await covalentResponse.json();
 
     if (!covalentData.data || !covalentData.data.items) {
       return res.status(500).json({ message: 'Failed to fetch wallet data' });
     }
 
-    const assets = covalentData.data.items.map(item => 
+    const assets = covalentData.data.items.map(item =>
       `${item.contract_ticker_symbol}: ${item.balance / Math.pow(10, item.contract_decimals)}`
     ).join(', ');
 
-    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
@@ -36,15 +36,17 @@
       })
     });
 
-    const openaiData = await openaiRes.json();
+    const openaiData = await openaiResponse.json();
 
     if (openaiData.error) {
       console.error('OpenAI API error:', openaiData.error);
       return res.status(500).json({ message: 'Failed to analyze wallet', detail: openaiData.error });
     }
 
-    res.status(200).json({ assets: covalentData.data.items, analysis: openaiData.choices[0].message.content });
-
+    res.status(200).json({
+      assets: covalentData.data.items,
+      analysis: openaiData.choices[0].message.content
+    });
   } catch (error) {
     console.error('Server error:', error);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
