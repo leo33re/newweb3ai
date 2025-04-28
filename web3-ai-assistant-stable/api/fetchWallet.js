@@ -17,7 +17,7 @@
       return res.status(500).json({ message: 'Failed to fetch wallet data' });
     }
 
-    const assets = covalentData.data.items.map(item =>
+    const assets = covalentData.data.items.map(item => 
       `${item.contract_ticker_symbol}: ${item.balance / Math.pow(10, item.contract_decimals)}`
     ).join(', ');
 
@@ -30,8 +30,8 @@
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: '你是一个专业的Web3钱包资产分析师。' },
-          { role: 'user', content: `以下是我的钱包资产情况：${assets}。请帮我分析这个钱包的特点和用户类型。` }
+          { role: 'system', content: '你是一个专业的钱包资产分析师，分析用户钱包资产的特点和类型。' },
+          { role: 'user', content: `钱包资产：${assets}，请进行分析。` }
         ]
       })
     });
@@ -47,6 +47,7 @@
       assets: covalentData.data.items,
       analysis: openaiData.choices[0].message.content
     });
+
   } catch (error) {
     console.error('Server error:', error);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
