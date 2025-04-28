@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 钱包资产分析</title>
+</head>
+<body>
+  <h1>Web3 钱包资产分析</h1>
+  <form id="wallet-form">
+    <input type="text" id="wallet" placeholder="输入你的钱包地址" required />
+    <button type="submit">分析钱包</button>
+  </form>
+  <pre id="output"></pre>
+
+  <script>
+    document.getElementById('wallet-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const wallet = document.getElementById('wallet').value;
+      const res = await fetch('/api/fetchWallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: wallet })
+      });
+      const data = await res.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
