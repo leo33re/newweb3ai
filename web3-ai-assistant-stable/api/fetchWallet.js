@@ -1,6 +1,3 @@
-
-const fetch = require('node-fetch');
-
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -20,7 +17,9 @@ module.exports = async (req, res) => {
       return res.status(500).json({ message: 'Failed to fetch wallet data' });
     }
 
-    const assets = covalentData.data.items.map(item => `${item.contract_ticker_symbol}: ${item.balance / Math.pow(10, item.contract_decimals)}`).join(', ');
+    const assets = covalentData.data.items.map(item => 
+      `${item.contract_ticker_symbol}: ${item.balance / Math.pow(10, item.contract_decimals)}`
+    ).join(', ');
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -51,3 +50,4 @@ module.exports = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
+
